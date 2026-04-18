@@ -1,0 +1,114 @@
+Q.1 Write a simulation program for disk scheduling using C-LOOK algorithm. Accept
+total number of disk blocks, disk request string, and current head position from the user.
+Display the list of request in the order in which it is served.
+Also display the total number of head moments. 56, 59, 40, 19, 91, 161, 151, 39, 185
+Start Head Position: 48
+Direction: User Defined
+
+#include <stdio.h>
+#include <stdlib.h>
+int main() {
+int n, head, direction, totalMovement = 0;
+printf("Enter number of requests: ");
+scanf("%d", &n);
+int requests[n + 1];
+printf("Enter the requests: ");
+for(int i = 0; i < n; i++) {
+scanf("%d", &requests[i]);
+}
+printf("Enter initial head position: ");
+scanf("%d", &head);
+printf("Enter direction (0 for left, 1 for right): ");
+scanf("%d", &direction); 
+requests[n] = head;
+n++;
+for(int i = 0; i < n - 1; i++) {
+for(int j = 0; j < n - i - 1; j++) {
+if(requests[j] > requests[j + 1]) {
+int temp = requests[j];
+requests[j] = requests[j + 1];
+requests[j + 1] = temp;
+}
+}
+}
+printf("\nC-LOOK Disk Scheduling Algorithm\n");
+printf("Head movement sequence: %d", head);
+int pos;
+for(int i = 0; i < n; i++) {
+if(requests[i] == head) {
+pos = i;
+break;
+}
+}
+if(direction == 1) { 
+for(int i = pos + 1; i < n; i++) {
+totalMovement += abs(requests[i] - head);
+head = requests[i];
+printf(" -> %d", head);
+}
+for(int i = 0; i < pos; i++) {
+totalMovement += abs(requests[i] - head);
+head = requests[i];
+printf(" -> %d", head);
+}
+} else { 
+for(int i = pos - 1; i >= 0; i--) {
+totalMovement += abs(requests[i] - head);
+head = requests[i];
+printf(" -> %d", head);
+}
+for(int i = n - 1; i > pos; i--) {
+totalMovement += abs(requests[i] - head);
+head = requests[i];
+printf(" -> %d", head);
+}
+}
+printf("\nTotal head movement: %d\n", totalMovement);
+return 0;  
+}
+
+Q.2 Write an MPI program to calculate sum of randomly generated 1000 numbers (stored
+in array) on a cluster
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpi.h>
+#define N 1000
+int main(int argc, char *argv[]) {
+int rank, size;
+int numbers[N];
+int local_sum = 0, total_sum = 0;
+int local_n;
+MPI_Init(&argc, &argv);
+MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+MPI_Comm_size(MPI_COMM_WORLD, &size);
+local_n = N / size; // Divide work equally
+if(rank == 0) {
+for(int i = 0; i < N; i++) {
+numbers[i] = rand() % 100;
+}
+}
+int local_numbers[local_n];
+Q.2 Write an MPI program to calculate sum of randomly generated 1000 numbers (stored
+in array) on a cluster
+CODE:
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpi.h>
+#define N 1000
+int main(int argc, char *argv[]) {
+int rank, size;
+int numbers[N];
+int local_sum = 0, total_sum = 0;
+int local_n;
+MPI_Init(&argc, &argv);
+MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+MPI_Comm_size(MPI_COMM_WORLD, &size);
+local_n = N / size; 
+if(rank == 0) {
+for(int i = 0; i < N; i++) {
+numbers[i] = rand() % 100;
+}
+}
+int local_numbers[local_n];
+

@@ -1,0 +1,75 @@
+Q.1 Write an MPI program to find the min number from randomly generated 1000
+numbers (stored in array) on a cluster (Hint: Use MPI_Reduce)
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpi.h>
+#define N 1000
+int main(int argc, char *argv[]) {
+int rank, size;
+int numbers[N];
+int local_n;
+int local_min, local_max;
+int global_min, global_max;
+MPI_Init(&argc, &argv);
+MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+MPI_Comm_size(MPI_COMM_WORLD, &size);
+local_n = N / size;
+if(rank == 0) {
+for(int i = 0; i < N; i++) {
+numbers[i] = rand() % 1000;
+}
+}
+int local_numbers[local_n];
+MPI_Scatter(numbers, local_n, MPI_INT,
+local_numbers, local_n, MPI_INT, 
+0, MPI_COMM_WORLD);
+local_min = local_numbers[0];
+local_max = local_numbers[0];
+for(int i = 1; i < local_n; i++) {
+if(local_numbers[i] < local_min)
+local_min = local_numbers[i];
+if(local_numbers[i] > local_max)
+local_max = local_numbers[i];
+}
+MPI_Reduce(&local_min, &global_min, 1,
+MPI_INT, MPI_MIN, 0, MPI_COMM_WORLD);
+MPI_Reduce(&local_max, &global_max, 1,
+MPI_INT, MPI_MAX, 0, MPI_COMM_WORLD);
+if(rank == 0) {
+printf("Minimum number = %d\n", global_min);
+printf("Maximum number = %d\n", global_max);
+}
+MPI_Finalize();
+return 0;
+}
+
+Q.2 Write a simulation program for disk scheduling using FCFS algorithm. Accept total
+number of disk blocks, disk request string, and current head position from the user.
+Display the list of request in the order in which it is served. Also display the total number
+of head moments. 65, 95, 30, 91, 18, 116, 142, 44, 168 Start Head Position: 52
+
+CODE:
+#include <stdio.h>
+#include <stdlib.h>
+int main() {
+int n, head, totalMovement = 0;
+printf("Enter the number of requests: ");
+scanf("%d", &n);
+int requests[n];
+printf("Enter the requests (disk track numbers): ");
+for (int i = 0; i < n; i++) {
+scanf("%d", &requests[i]);
+}
+printf("Enter the initial head position: ");
+scanf("%d", &head);
+printf("FCFS Disk Scheduling Algorithm\n");
+printf("Head movement sequence: %d", head);
+for (int i = 0; i < n; i++) {
+ totalMovement += abs(requests[i] - head);
+ head = requests[i]; 
+ printf(" -> %d", head);  
+}
+printf("\nTotal head movement: %d\n", totalMovement);
+return 0;
+} 

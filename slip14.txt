@@ -1,0 +1,141 @@
+Q.1 Write a program to simulate Sequential (Contiguous) file allocation method.
+Assume disk with n number of blocks. Give value of n as input. Randomly mark some
+block as allocated and accordingly maintain the list of free blocks Write menu driver
+program with menu options as mentioned below and implement each option.
+• Show Bit Vector
+• Show Directory
+• Delete File
+• Exit
+
+#include <stdio.h>
+#include <string.h>
+int main() {
+ int n;
+ printf("Enter number of disk blocks: ");
+ scanf("%d", &n);
+ int bit[n]; 
+ char fname[10][20]; 
+ int start[10], length[10]; 
+ int fileCount = 0;
+ for (int i = 0; i < n; i++)
+ bit[i] = 0; 
+ int choice; 
+do {
+ printf("\n--- Sequential File Allocation ---\n");
+ printf("1. Show Bit Vector\n");
+ printf("2. Create New File\n");
+ printf("3. Show Directory\n");
+ printf("4. Delete File\n");
+ printf("5. Exit\n");
+ printf("Enter choice: ");
+ scanf("%d", &choice);
+ switch (choice) {
+ case 1: // Show Bit Vector
+ for (int i = 0; i < n; i++)
+ printf("%d ", bit[i]);
+ printf("\n");
+ break;
+ case 2: { 
+ int s, len, free = 1;
+ printf("Enter file name: ");
+ scanf("%s", fname[fileCount]);
+ printf("Enter starting block: ");
+ scanf("%d", &s);
+ printf("Enter number of blocks: ");
+ scanf("%d", &len);
+for (int i = s; i < s + len; i++) {
+ if (i >= n || bit[i] == 1) {
+ free = 0;
+ break;
+ }
+ }
+ if (free) {
+ for (int i = s; i < s + len; i++)
+ bit[i] = 1;
+ start[fileCount] = s;
+ length[fileCount] = len;
+ fileCount++;
+ printf("File created successfully\n");
+ } else {
+ printf("Blocks not available\n");
+ }
+ break;
+ }
+ case 3: 
+ printf("File\tStart\tLength\n");
+ for (int i = 0; i < fileCount; i++)
+ printf("%s\t%d\t%d\n",
+ fname[i], start[i], length[i]); 
+break;
+ case 4: { 
+ char del[20];
+ printf("Enter file name to delete: ");
+ scanf("%s", del);
+ for (int i = 0; i < fileCount; i++) {
+ if (strcmp(fname[i], del) == 0) {
+ for (int j = start[i];
+ j < start[i] + length[i]; j++)
+ bit[j] = 0;
+ strcpy(fname[i], fname[fileCount - 1]);
+ start[i] = start[fileCount - 1];
+ length[i] = length[fileCount - 1];
+ fileCount--;
+ printf("File deleted\n");
+ break;
+ }
+ }
+ break;
+ }
+ case 5:
+ printf("Exiting...\n"); 
+break;
+ default:
+ printf("Invalid choice\n");
+ }
+ } while (choice != 5);
+ return 0;
+}
+
+Q.2 Write a simulation program for disk scheduling using SSTF algorithm. Accept total
+number of disk blocks, disk request string, and current head position from the user. Display
+the list of request in the order in which it is served. Also display the total number of head
+moments.
+55, 58, 39, 18, 90, 160, 150, 38, 184
+Start Head Position: 50
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+int main() {
+int n, head, totalMovement = 0;
+ printf("Enter the number of requests: ");
+ scanf("%d", &n);
+ int request
+bool visited[n];
+ printf("Enter the requests (disk track numbers): ");
+ for (int i = 0; i < n; i++) {
+ scanf("%d", &requests[i]);
+ visited[i] = false; 
+ }
+ printf("Enter the initial head position: ");
+ scanf("%d", &head);
+ printf("SSTF Disk Scheduling Algorithm\n");
+ printf("Head movement sequence: %d", head);
+ for (int i = 0; i < n; i++) {
+ int closest = -1; 
+ int minDistance = __INT_MAX__; 
+ for (int j = 0; j < n; j++) {
+ if (!visited[j] && abs(requests[j] - head) < minDistance) {
+ minDistance = abs(requests[j] - head);
+ closest = j;
+}
+// Service the closest request
+visited[closest] = true; 
+totalMovement += minDistance; 
+head = requests[closest]; 
+printf(" -> %d", head); 
+}
+printf("\nTotal head movement: %d\n", totalMovement);
+return 0;
+}
+ 

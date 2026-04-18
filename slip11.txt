@@ -1,0 +1,117 @@
+Q.1 Write a C program to simulate Banker’s algorithm for the purpose of
+deadlock avoidance. the following snapshot of system, A, B, C and D are the
+resource type.
+Proces
+s
+Allocation Max Available
+A B C A B C A B C
+P0 0 1 0 0 0 0 0 0 0
+P1 2 0 0 2 0 2
+P2 3 0 3 0 0 0
+P3 2 1 1 1 0 0
+P4 0 0 2 0 0 2
+Implement the following Menu.
+a) Accept Available
+b) Display Allocation, Max
+c) Display the contents of need matrix
+d) Display Available
+
+CODE:
+#include <stdio.h>
+int n, m;
+int Alloc[10][10], Max[10][10], Need[10][10];
+int Avail[10];
+void accept_matrix(int A[10][10])
+{
+ int i, j;
+ for (i = 0; i < n; i++)
+ for (j = 0; j < m; j++)
+ scanf("%d", &A[i][j]);
+}
+void accept_available() 
+{
+ int i;
+ for (i = 0; i < m; i++)
+ scanf("%d", &Avail[i]);
+}
+void find_need()
+{
+ int i, j;
+ for (i = 0; i < n; i++)
+ for (j = 0; j < m; j++)
+ Need[i][j] = Max[i][j] - Alloc[i][j];
+}
+void display_matrix()
+{
+ int i, j;
+ printf("\nProcess\tAllocation\tMax\t\tNeed\n");
+ for (i = 0; i < n; i++)
+ {
+ printf("P%d\t", i);
+ for (j = 0; j < m; j++) 
+printf("%d ", Alloc[i][j]);
+ printf("\t\t");
+ for (j = 0; j < m; j++)
+ printf("%d ", Max[i][j]);
+ printf("\t\t");
+ for (j = 0; j < m; j++)
+ printf("%d ", Need[i][j]);
+ printf("\n");
+ }
+ printf("\nAvailable:\n");
+ for (j = 0; j < m; j++)
+ printf("%d ", Avail[j]);
+}
+int main()
+{
+ printf("Enter number of processes and resources: ");
+ scanf("%d %d", &n, &m)
+printf("Enter Allocation matrix:\n");
+ accept_matrix(Alloc);
+ printf("Enter Max matrix:\n");
+ accept_matrix(Max);
+ printf("Enter Available resources:\n");
+ accept_available();
+ find_need();
+ display_matrix();
+ return 0;
+}
+
+Q.2 Write an MPI program to find the min number from randomly generated 1000 numbers
+(stored in array) on a cluster (Hint: Use MPI_Reduce)
+
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define SIZE 1000 
+int main(int argc, char* argv[]) {
+ int rank, size;
+int local_sum = 0, global_sum = 0;
+ double average;
+ int numbers[SIZE];
+ MPI_Init(&argc, &argv);
+ MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+ MPI_Comm_size(MPI_COMM_WORLD, &size);
+ int chunk_size = SIZE / size;
+ int local_numbers[chunk_size];
+ if (rank == 0) {
+ srand(time(NULL));
+ for (int i = 0; i < SIZE; i++) {
+ numbers[i] = rand() % 100; }
+ }
+ MPI_Scatter(numbers, chunk_size, MPI_INT, local_numbers, chunk_size, MPI_INT, 0,
+MPI_COMM_WORLD);
+ for (int i = 0; i < chunk_size; i++) {
+ local_sum += local_numbers[i];
+ }
+MPI_Reduce(&local_sum, &global_sum, 1, MPI_INT, MPI_SUM, 0,
+MPI_COMM_WORLD);
+ if (rank == 0) {
+ average = (double)global_sum / SIZE;
+ printf("Total Sum: %d\n", global_sum);
+ printf("Average: %.2f\n", average);
+ }
+ MPI_Finalize();
+ return 0;
+}

@@ -1,0 +1,219 @@
+Q.1 Consider the following snapshot of the system.
+Proces
+s
+Allocation Max Available
+A B C D A B C D A B C D
+P0 2 0 0 1 4 2 1 2 3 3 2 1
+P1 3 1 2 1 5 2 5 2
+P2 2 1 0 3 2 3 1 6
+P3 1 3 1 2 1 4 2 4
+P4 1 4 3 2 3 6 6 5
+Using Resource –Request algorithm to Check whether the current system is in safe state
+or not
+
+#include <stdio.h>
+int n, m;
+int Alloc[10][10], Max[10][10], Need[10][10];
+int Avail[10], Work[10];
+int Finish[10], Safe[10];
+int Request[10], proc;
+void accept_matrix(int A[10][10])
+{
+ int i, j;
+ for(i = 0; i < n; i++)
+ for(j = 0; j < m; j++)
+ scanf("%d", &A[i][j]);
+}
+void accept_available()
+{
+ int i;
+for(i = 0; i < m; i++)
+ scanf("%d", &Avail[i]);
+}
+void find_need()
+{
+ int i, j;
+ for(i = 0; i < n; i++)
+ for(j = 0; j < m; j++)
+ Need[i][j] = Max[i][j] - Alloc[i][j];
+}
+void accept_request()
+{
+ int i;
+ printf("Enter process number: ");
+ scanf("%d", &proc);
+ printf("Enter request:\n");
+ for(i = 0; i < m; i++)
+ scanf("%d", &Request[i]);
+}
+int safety_algo()
+{
+ int i, j, k, count = 0;
+ for(i = 0; i < m; i++)
+ Work[i] = Avail[i];
+ for(i = 0; i < n; i++)
+ Finish[i] = 0;
+ while(count < n)
+ {
+ int allocated = 0;
+ for(i = 0; i < n; i++)
+ {
+ if(Finish[i] == 0)
+ {
+ int canExecute = 1;
+ for(j = 0; j < m; j++)
+ {
+ if(Need[i][j] > Work[j])
+ { 
+canExecute = 0;
+ break;
+ }
+ }
+ if(canExecute)
+ {
+ for(k = 0; k < m; k++)
+ Work[k] += Alloc[i][k];
+ Safe[count++] = i;
+ Finish[i] = 1;
+ allocated = 1;
+ }
+ }
+ }
+ if(allocated == 0)
+ return 0; 
+ }
+ return 1; 
+}
+void resource_request_algo() 
+{
+ int i;
+ for(i = 0; i < m; i++)
+ {
+ if(Request[i] > Need[proc][i])
+ {
+ printf("Error: Request exceeds maximum need\n");
+ return;
+ }
+ }
+ for(i = 0; i < m; i++)
+ {
+ if(Request[i] > Avail[i])
+ {
+ printf("Resources not available. Process must wait\n");
+ return;
+ }
+ }
+ for(i = 0; i < m; i++)
+ { 
+Avail[i] -= Request[i];
+ Alloc[proc][i] += Request[i];
+ Need[proc][i] -= Request[i];
+ }
+ if(safety_algo())
+ {
+ printf("\nSystem is SAFE\nSafe Sequence: ");
+ for(i = 0; i < n; i++)
+ printf("P%d ", Safe[i]);
+ }
+ else
+ {
+ printf("\nSystem is UNSAFE\n");
+ }
+}
+int main()
+{
+ printf("Enter number of processes and resources: ");
+ scanf("%d %d", &n, &m);
+ printf("Enter Allocation matrix:\n");
+ accept_matrix(Alloc); 
+printf("Enter Max matrix:\n");
+ accept_matrix(Max);
+ printf("Enter Available resources:\n");
+ accept_available();
+ find_need();
+ accept_request();
+ resource_request_algo();
+ return 0;
+}
+
+Q.2 Write a simulation program for disk scheduling using SCAN algorithm. Accept total
+number of disk blocks, disk request string, and current head position from the user.
+Display the list of request in the order in which it is served.
+Also display the total number of head moments. 82, 170, 43, 140, 24, 16,190
+Starting Head Position: 50
+Direction: Right
+
+#include <stdio.h>
+#include <stdlib.h>
+int main() {
+int n, head, direction, totalMovement = 0;
+printf("Enter the number of requests: ");
+scanf("%d", &n);
+int requests[n + 1]; 
+int maxTrack;
+printf("Enter the maximum track number: ");
+scanf("%d", &maxTrack);
+printf("Enter the requests (disk track numbers): ");
+for (int i = 0; i < n; i++) {
+scanf("%d", &requests[i]);
+}
+printf("Enter the initial head position: ");
+scanf("%d", &head);
+printf("Enter the direction (0 for left, 1 for right): ");
+scanf("%d", &direction);
+requests[n] = head;
+n++;
+ for (int i = 0; i < n - 1; i++) {
+ for (int j = 0; j < n - i - 1; j++) {
+ if (requests[j] > requests[j + 1]) {
+ int temp = requests[j];
+ requests[j] = requests[j + 1];
+ requests[j + 1] = temp; 
+}
+ }
+ }
+ printf("SCAN Disk Scheduling Algorithm\n");
+ printf("Head movement sequence: %d", head);
+ int pos;
+ for (int i = 0; i < n; i++) {
+ if (requests[i] == head) {
+ pos = i;
+ break;
+ }
+ }
+ if (direction == 1) { 
+ for (int i = pos + 1; i < n; i++) {
+ totalMovement += abs(requests[i] - head);
+ head = requests[i];
+ printf(" -> %d", head);
+ }
+ if (head != maxTrack) { 
+ totalMovement += abs(maxTrack - head);
+ head = maxTrack;
+ printf(" -> %d", head);
+ }
+ for (int i = pos - 1; i >= 0; i--) { 
+totalMovement += abs(requests[i] - head);
+ head = requests[i];
+ printf(" -> %d", head);
+ }
+ } else { // Moving left
+ for (int i = pos - 1; i >= 0; i--) {
+ totalMovement += abs(requests[i] - head);
+ head = requests[i];
+ printf(" -> %d", head);
+ }
+ if (head != 0) { 
+ totalMovement += head;
+ head = 0;
+ printf(" -> %d", head);
+ }
+ for (int i = pos + 1; i < n; i++) {
+ totalMovement += abs(requests[i] - head);
+ head = requests[i];
+ printf(" -> %d", head);
+ }
+ }
+ printf("\nTotal head movement: %d\n", totalMovement);
+ return 0;
+}
